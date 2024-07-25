@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        h1 {
+            text-align: center;
+            margin: auto;
+        }
+        .center-link a {
+            text-decoration: none;
+            color: #007bff;
+        }
+        .center-link a:hover {
+            color: #0056b3;
+        }
+        td a {
+            text-decoration: none;
+            color: #007bff;
+        }
+        td a:hover {
+            color: #0056b3;
+        }
+        table {
+            border-collapse: collapse;
+            width: 300px;
+            margin: auto;
+        }
+        th, td {
+            border: 1px solid black;
+            text-align: center;
+            padding: 4px;
+        }
+        th {
+            background: #fc0;
+            height: 40px;
+            vertical-align: bottom;
+            padding: 0;
+        }
+        form button {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        a {
+            display: block;
+            text-align: center;
+            margin-top: 10px;
+            text-decoration: none;
+            color: #007bff;
+        }
+        .logout-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+<h1>Панель администратора для <a href="/user" th:text="${curUser.username}"></a></h1>
+<h1>Все пользователи</h1>
+
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Имя</th>
+        <th>Фамилия</th>
+        <th>Возраст</th>
+        <th>Права</th>
+        <th>Действие</th>
+    </tr>
+    <tr th:each="user : ${users}">
+        <td th:text="${user.id}">1</td>
+        <td th:text="${user.name}">John</td>
+        <td th:text="${user.lastName}">Doe</td>
+        <td th:text="${user.age}">30</td>
+        <td>
+            <span th:each="role : ${user.roles}" th:text="${role.name}">ROLE_USER</span>
+        </td>
+        <td>
+            <a th:href="@{/admin/edit/{id}(id=${user.id})}">Изменить</a>
+            <a th:href="@{/admin/delete/{id}(id=${user.id})}">Удалить</a>
+        </td>
+    </tr>
+
+</table>
+<a href="/admin/new-user">Добавить пользователя</a>
+<div class="logout-container">
+    <form th:action="@{/logout}" method="post">
+        <button type="submit">Выход</button>
+    </form>
+</div>
+</body>
+</html>

@@ -1,10 +1,58 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org" xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
 <head>
+    <meta charset="UTF-8">
     <title>Spring Security Example</title>
+    <style>
+        h1 {
+            text-align: center;
+
+            margin-bottom: 20px;
+        }
+        p {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .logout-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        form button {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        a {
+            display: block;
+            text-align: center;
+            margin-top: 10px;
+            text-decoration: none;
+            color: #007bff;
+        }
+    </style>
 </head>
 <body>
-<h1>User, welcome spring boot security page!</h1>
+
+<h1>Добро Пожаловать, <span th:text="${user.username}"></span>!</h1>
+<p>Имя: <span th:text="${user.name}"></span></p>
+<p>Фамилия: <span th:text="${user.lastName}"></span></p>
+<p>Возраст: <span th:text="${user.age}"></span></p>
+<p>Права: <span th:each="role : ${user.roles}" th:text="${role.name}">ROLE_USER</span></p>
+
+<div th:if="${#lists.size(user.roles) == 2}">
+    <a href="/admin">Перейти на страницу админа</a>
+</div>
+
+<div class="logout-container">
+    <form th:action="@{/logout}" method="post">
+        <button type="submit">Выход</button>
+    </form>
+</div>
+
 
 
 </body>
