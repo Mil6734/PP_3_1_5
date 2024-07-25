@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        h1 {
+            text-align: center;
+
+            margin-bottom: 20px;
+        }
+        form {
+            width: 300px;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin: auto;
+            text-align: center;
+
+        }
+        form label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        form input {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        form button {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        a {
+            display: block;
+            text-align: center;
+            margin-top: 10px;
+            text-decoration: none;
+            color: #007bff;
+        }
+    </style>
+</head>
+<body>
+<h1>Изменение пользователя</h1>
+
+<form th:action="@{/admin/edit/{id}(id=${user.id})}" th:object="${user}" method="post">
+    <label>ID: <input type="text" th:field="*{id}" readonly /></label><br/>
+    <label>Имя: <input type="text" th:field="*{name}" /></label><br/>
+    <label>Фамилия: <input type="text" th:field="*{lastName}" /></label><br/>
+    <label>Возраст: <input type="number" th:field="*{age}" /></label><br/>
+    <label>Логин: <input type="text" th:field="*{username}" /></label><br/>
+    <label>Пароль: <input type="password" th:field="*{password}" /></label><br/>
+    <label>Роль:</label><br/>
+    <div th:each="role : ${roles}">
+        <input type="checkbox" th:value="${role.id}" th:name="roleId" th:text="${role.name}" />
+    </div>
+    <button type="submit">Добавить пользователя</button>
+</form>
+<a href="/admin">Назад</a>
+</body>
+</html>
