@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -72,9 +73,18 @@ public class AdminController {
         return "redirect:/admin";
     }
 
-    @GetMapping("admin/delete/{id}")
-    public String deleteUser(@PathVariable("id") Long id) {
+    @GetMapping("/admin/view")
+    public String showViewUserForm(@RequestParam("id") Long id, Model model) {
+        User user = userService.getUserById(id);
+        model.addAttribute("user", user);
+        model.addAttribute("roles", roleService.getRoles());
+        return "viewUser";
+    }
+
+    @DeleteMapping("/admin/delete")
+    public String deleteUser(@RequestParam("id") Long id) {
         userService.deleteUser(id);
         return "redirect:/admin";
     }
+
 }
