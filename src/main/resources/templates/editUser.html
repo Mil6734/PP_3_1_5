@@ -1,70 +1,77 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="https://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
-    <style>
-        h1 {
-            text-align: center;
-
-            margin-bottom: 20px;
-        }
-        form {
-            width: 300px;
-            background-color: #ffffff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            margin: auto;
-            text-align: center;
-
-        }
-        form label {
-            display: block;
-            margin-bottom: 10px;
-            font-weight: bold;
-        }
-        form input {
-            width: 100%;
-            padding: 8px;
-            box-sizing: border-box;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-        form button {
-            width: 100%;
-            padding: 10px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            cursor: pointer;
-            margin-top: 20px;
-        }
-        a {
-            display: block;
-            text-align: center;
-            margin-top: 10px;
-            text-decoration: none;
-            color: #007bff;
-        }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Edit User</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-<h1>Изменение пользователя</h1>
 
-<form th:action="@{/admin/edit/{id}(id=${user.id})}" th:object="${user}" method="post">
-    <label>ID: <input type="text" th:field="*{id}" readonly /></label><br/>
-    <label>Имя: <input type="text" th:field="*{name}" /></label><br/>
-    <label>Фамилия: <input type="text" th:field="*{lastName}" /></label><br/>
-    <label>Возраст: <input type="number" th:field="*{age}" /></label><br/>
-    <label>Логин: <input type="text" th:field="*{username}" /></label><br/>
-    <label>Пароль: <input type="password" th:field="*{password}" /></label><br/>
-    <label>Роль:</label><br/>
-    <div th:each="role : ${roles}">
-        <input type="checkbox" th:value="${role.id}" th:name="roleId" th:text="${role.name}" />
+<div class="modal fade" id="editUserModal" tabindex="-1" role="dialog" aria-labelledby="editUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editUserModalLabel">Edit user</h5>
+            </div>
+            <div class="modal-body">
+                <form th:action="@{/admin/edit/{id}(id=${user.id})}" th:object="${user}" method="post">
+                    <input type="hidden" name="_method" value="POST">
+                    <div class="form-group">
+                        <label for="id">ID</label>
+                        <input type="text" id="id" th:field="*{id}" class="form-control" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="name">Name</label>
+                        <input type="text" id="name" th:field="*{name}" class="form-control" placeholder="Enter name">
+                    </div>
+                    <div class="form-group">
+                        <label for="surname">Surname</label>
+                        <input type="text" id="surname" th:field="*{lastName}" class="form-control" placeholder="Enter lastName">
+                    </div>
+                    <div class="form-group">
+                        <label for="salary">Salary</label>
+                        <input type="text" id="salary" th:field="*{age}" class="form-control" placeholder="Enter age">
+                    </div>
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input type="text" id="username" th:field="*{username}" class="form-control" placeholder="Enter username">
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" th:field="*{password}" class="form-control" placeholder="Enter password">
+                    </div>
+                    <div class="form-group">
+                        <label for="roles">Roles</label>
+                        <select id="roles" name="roleId" class="form-control" multiple>
+                            <option th:each="role : ${roles}" th:value="${role.id}" th:text="${role.name}">ROLE_USER</option>
+                        </select>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" id="closeButton">Close</button>
+                        <button type="submit" class="btn btn-primary">Edit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
-    <button type="submit">Добавить пользователя</button>
-</form>
-<a href="/admin">Назад</a>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+        $('#editUserModal').modal('show');
+
+        $('#closeButton').click(function() {
+            $('#editUserModal').modal('hide');
+            window.location.href = '/admin';
+        });
+    });
+</script>
+
 </body>
 </html>
