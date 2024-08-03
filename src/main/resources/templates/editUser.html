@@ -8,14 +8,15 @@
 </head>
 <body>
 
-<div class="modal fade" id="editUserModal" tabindex="-1" role="dialog" aria-labelledby="editUserModalLabel" aria-hidden="true">
+<div class="modal fade" id="editUserModal" tabindex="-1" role="dialog" aria-labelledby="editUserModalLabel"
+     aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="editUserModalLabel">Edit user</h5>
             </div>
             <div class="modal-body">
-                <form th:action="@{/admin/edit/{id}(id=${user.id})}" th:object="${user}" method="post">
+                <form th:action="@{/admin/update}" th:object="${user}" method="post">
                     <input type="hidden" name="_method" value="POST">
                     <div class="form-group">
                         <label for="id">ID</label>
@@ -27,46 +28,46 @@
                     </div>
                     <div class="form-group">
                         <label for="surname">Surname</label>
-                        <input type="text" id="surname" th:field="*{lastName}" class="form-control" placeholder="Enter lastName">
+                        <input type="text" id="surname" th:field="*{lastName}" class="form-control"
+                               placeholder="Enter lastName">
                     </div>
                     <div class="form-group">
-                        <label for="salary">Salary</label>
-                        <input type="text" id="salary" th:field="*{age}" class="form-control" placeholder="Enter age">
+                        <label for="age">Age</label>
+                        <input type="text" id="age" th:field="*{age}" class="form-control" placeholder="Enter age">
                     </div>
                     <div class="form-group">
                         <label for="username">Username</label>
-                        <input type="text" id="username" th:field="*{username}" class="form-control" placeholder="Enter username">
+                        <input type="text" id="username" th:field="*{username}" class="form-control"
+                               placeholder="Enter username">
                     </div>
                     <div class="form-group">
                         <label for="password">Password</label>
-                        <input type="password" id="password" th:field="*{password}" class="form-control" placeholder="Enter password">
+                        <input type="password" id="password" th:field="*{password}" class="form-control"
+                               placeholder="Enter password">
                     </div>
                     <div class="form-group">
                         <label for="roles">Roles</label>
-                        <select id="roles" name="roleId" class="form-control" multiple>
-                            <option th:each="role : ${roles}" th:value="${role.id}" th:text="${role.name}">ROLE_USER</option>
+                        <select id="roles" name="roleId" multiple class="form-control" required>
+                            <option th:each="role : ${roles}" th:value="${role.id}" th:text="${role.name}"></option>
                         </select>
                     </div>
-
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" id="closeButton">Close</button>
-                        <button type="submit" class="btn btn-primary">Edit</button>
-                    </div>
+                    <button type="submit" class="btn btn-primary">Save changes</button>
+                    <button type="button" class="btn btn-secondary" id="closeButton">Close</button>
                 </form>
             </div>
         </div>
     </div>
 </div>
 
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
 <script>
-    $(document).ready(function() {
+    $(document).ready(function () {
         $('#editUserModal').modal('show');
 
-        $('#closeButton').click(function() {
+        $('#closeButton').click(function () {
             $('#editUserModal').modal('hide');
             window.location.href = '/admin';
         });

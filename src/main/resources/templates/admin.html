@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="https://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8" >
+    <meta charset="UTF-8">
     <title>Admin</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
           integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
@@ -62,16 +62,16 @@
                             <td th:text="${user.age}"></td>
                             <td th:text="${user.username}"></td>
                             <td>
-                                <li th:each="role : ${user.roles}" th:text="${role.name}"></li>
+                                <ul>
+                                    <li th:each="role : ${user.roles}" th:text="${role.name}"></li>
+                                </ul>
                             </td>
                             <td>
-                                <form th:action="@{/admin/edit/{id}(id=${user.id})}" method="get">
-                                    <input type="hidden" name="id" th:value="${user.id}"/>
-                                    <button type="submit" class="btn btn-primary">Edit</button>
-                                </form>
+                                <a th:href="@{/admin/edit/{id}(id=${user.id})}" class="btn btn-primary">Edit</a>
                             </td>
                             <td>
-                                <form th:action="@{/admin/view}" method="get">
+                                <form th:action="@{/admin/delete}" method="post">
+                                    <input type="hidden" name="_method" value="DELETE">
                                     <input type="hidden" name="id" th:value="${user.id}"/>
                                     <button type="submit" class="btn btn-danger">Delete</button>
                                 </form>

@@ -9,7 +9,8 @@
 <body>
 <nav class="navbar navbar-dark bg-dark">
     <span class="navbar-text">
-        admin@mail.ru with roles: ADMIN USER
+        <span th:text="${#authentication.name}"></span> with roles:
+        <span th:each="role : ${#authentication.principal.authorities}" th:text="${role.authority}">ROLE</span>
     </span>
     <form th:action="@{/logout}" method="post" class="form-inline">
         <button type="submit" class="btn btn-outline-light">Logout</button>
@@ -20,6 +21,8 @@
         <div class="col-2">
             <div class="list-group">
                 <a href="/user" class="list-group-item list-group-item-action active">User</a>
+                <a href="/admin" class="list-group-item list-group-item-action" sec:authorize="hasRole('ADMIN')">Admin</a>
+
             </div>
         </div>
         <div class="col-10">
