@@ -38,7 +38,6 @@ public class UserServiceImp implements UserService {
         return user;
     }
 
-
     @Transactional
     @Override
     public void addUser(User user, List<Long> roleId) {
@@ -51,10 +50,22 @@ public class UserServiceImp implements UserService {
     @Transactional
     @Override
     public void updateUser(User user, List<Long> roleId) {
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        User existingUser = userRepository.findById(user.getId())
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        existingUser.setName(user.getName());
+        existingUser.setLastName(user.getLastName());
+        existingUser.setAge(user.getAge());
+        existingUser.setUsername(user.getUsername());
+
+        if (user.getPassword() != null && !user.getPassword().isEmpty()) {
+            existingUser.setPassword(passwordEncoder.encode(user.getPassword()));
+        }
+
         Set<Role> roles = new HashSet<>(roleRepository.findAllById(roleId));
-        user.setRoles(roles);
-        userRepository.save(user);
+        existingUser.setRoles(roles);
+
+        userRepository.save(existingUser);
     }
 
     @Transactional
@@ -76,69 +87,3 @@ public class UserServiceImp implements UserService {
     }
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//package ru.kata.spring.boot_security.demo.service;
-//
-//
-//import com.pp_3_1_2_first.springboot.dao.UserDao;
-//
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.stereotype.Service;
-//import org.springframework.transaction.annotation.Transactional;
-//import ru.kata.spring.boot_security.demo.model.User;
-//
-//import java.util.List;
-//
-//@Service
-//public class UserServiceImp implements UserService {
-//
-//    private UserDao userDao;
-//
-//    @Autowired
-//    public UserServiceImp(UserDao userDao) {
-//        this.userDao = userDao;
-//    }
-//
-//    @Transactional
-//    @Override
-//    public void addUser(User user) {
-//        userDao.addUser(user);
-//    }
-//
-//    @Transactional
-//    @Override
-//    public void updateUser(User user) {
-//        userDao.updateUser(user);
-//    }
-//
-//    @Transactional
-//    @Override
-//    public void deleteUser(Long id) {
-//        userDao.deleteUser(id);
-//    }
-//
-//    @Transactional
-//    @Override
-//    public List<User> getAllUsers() {
-//        return userDao.getAllUsers();
-//    }
-//
-//    @Transactional
-//    @Override
-//    public User getUserById(Long id) {
-//        return userDao.getUserById(id);
-//    }
-//}
