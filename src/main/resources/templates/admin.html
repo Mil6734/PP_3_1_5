@@ -3,16 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <title>Admin</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
-          integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 <body>
 <nav class="navbar navbar-dark bg-dark">
     <span class="navbar-text">
-        <span th:text="${curUser.username}"></span> with roles:
-        <span th:each="role : ${curUser.roles}" th:text="${role.name}"></span>
+        <span th:text="${#authentication.name}"></span> with roles:
+        <span th:each="role : ${#authentication.principal.authorities}" th:text="${role.authority}">ROLE</span>
     </span>
-    <form th:action="@{/logout}" method="post" class="form-inline">
+    <form id="logoutForm" method="post" action="/logout" class="form-inline">
         <button type="submit" class="btn btn-outline-light">Logout</button>
     </form>
 </nav>
@@ -35,13 +34,13 @@
                             <a class="nav-link active" href="#">Users table</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/admin/new-user">New User</a>
+                            <a class="nav-link" href="#" data-toggle="modal" data-target="#newUserModal">New User</a>
                         </li>
                     </ul>
                 </div>
                 <div class="card-body">
                     <h5 class="card-title">All users</h5>
-                    <table class="table table-striped">
+                    <table class="table table-striped" id="usersTable">
                         <thead>
                         <tr>
                             <th>ID</th>
@@ -54,29 +53,8 @@
                             <th>Delete</th>
                         </tr>
                         </thead>
-                        <tbody>
-                        <tr th:each="user : ${users}">
-                            <td th:text="${user.id}"></td>
-                            <td th:text="${user.name}"></td>
-                            <td th:text="${user.lastName}"></td>
-                            <td th:text="${user.age}"></td>
-                            <td th:text="${user.username}"></td>
-                            <td>
-                                <ul>
-                                    <li th:each="role : ${user.roles}" th:text="${role.name}"></li>
-                                </ul>
-                            </td>
-                            <td>
-                                <a th:href="@{/admin/edit/{id}(id=${user.id})}" class="btn btn-primary">Edit</a>
-                            </td>
-                            <td>
-                                <form th:action="@{/admin/delete}" method="post">
-                                    <input type="hidden" name="_method" value="DELETE">
-                                    <input type="hidden" name="id" th:value="${user.id}"/>
-                                    <button type="submit" class="btn btn-danger">Delete</button>
-                                </form>
-                            </td>
-                        </tr>
+                        <tbody id="tableUsers">
+                        <!--JavaScript -->
                         </tbody>
                     </table>
                 </div>
@@ -85,10 +63,112 @@
     </div>
 </div>
 
+<!-- Edit Пользователя -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel">Edit User</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="editUserForm">
+                <div class="modal-body">
+                    <input type="hidden" id="editId">
+                    <div class="form-group">
+                        <label for="editUserName">Username</label>
+                        <input type="text" class="form-control" id="editUserName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editName">Name</label>
+                        <input type="text" class="form-control" id="editName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editLastName">Last Name</label>
+                        <input type="text" class="form-control" id="editLastName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editAge">Age</label>
+                        <input type="number" class="form-control" id="editAge" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editPassword">Password</label>
+                        <input type="password" class="form-control" id="editPassword">
+                    </div>
+                    <div class="form-group">
+                        <label for="rolesEdit">Roles</label>
+                        <select multiple class="form-control" id="rolesEdit" required>
+                            <option value="1">ROLE_USER</option>
+                            <option value="2">ROLE_ADMIN</option>
+                        </select>
+                        <div class="invalid-feedback">
+                            Please select at least one role.
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Save changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
-<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+<!-- Новый пользователь -->
+<div class="modal fade" id="newUserModal" tabindex="-1" aria-labelledby="newUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="newUserModalLabel">New User</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="newUserForm">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="newUserName">Username</label>
+                        <input type="text" class="form-control" id="newUserName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="newName">Name</label>
+                        <input type="text" class="form-control" id="newName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="newLastName">Last Name</label>
+                        <input type="text" class="form-control" id="newLastName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="newAge">Age</label>
+                        <input type="number" class="form-control" id="newAge" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="newPassword">Password</label>
+                        <input type="password" class="form-control" id="newPassword" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="rolesNew">Roles</label>
+                        <select multiple class="form-control" id="rolesNew" required>
+                            <option value="1">ROLE_USER</option>
+                            <option value="2">ROLE_ADMIN</option>
+                        </select>
+                        <div class="invalid-feedback">
+                            Please select at least one role.
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Add User</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-
+<script src="/static/admin.js"></script>
 </body>
 </html>

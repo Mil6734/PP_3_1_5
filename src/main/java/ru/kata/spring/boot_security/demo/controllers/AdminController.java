@@ -1,90 +1,88 @@
-package ru.kata.spring.boot_security.demo.controllers;
+    package ru.kata.spring.boot_security.demo.controllers;
 
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.filter.HiddenHttpMethodFilter;
-import ru.kata.spring.boot_security.demo.model.User;
-import ru.kata.spring.boot_security.demo.service.RoleService;
-import ru.kata.spring.boot_security.demo.service.UserService;
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.http.HttpStatus;
+    import org.springframework.http.ResponseEntity;
+    import org.springframework.security.core.Authentication;
+    import org.springframework.security.crypto.password.PasswordEncoder;
+    import org.springframework.web.bind.annotation.DeleteMapping;
+    import org.springframework.web.bind.annotation.GetMapping;
+    import org.springframework.web.bind.annotation.PathVariable;
+    import org.springframework.web.bind.annotation.PostMapping;
+    import org.springframework.web.bind.annotation.PutMapping;
+    import org.springframework.web.bind.annotation.RequestBody;
+    import org.springframework.web.bind.annotation.RequestMapping;
+    import org.springframework.web.bind.annotation.RequestParam;
+    import org.springframework.web.bind.annotation.RestController;
+    import ru.kata.spring.boot_security.demo.model.User;
+    import ru.kata.spring.boot_security.demo.service.RoleService;
+    import ru.kata.spring.boot_security.demo.service.UserService;
 
-import java.util.List;
+    import java.util.List;
 
-@Controller
+    @RestController
+    @RequestMapping("/api/admin")
+    public class AdminController {
+        private final UserService userService;
+        private final RoleService roleService;
+        private final PasswordEncoder passwordEncoder;
 
-public class AdminController {
-    private final UserService userService;
-    private final RoleService roleService;
+        @Autowired
+        public AdminController(UserService userService, RoleService roleService, PasswordEncoder passwordEncoder) {
+            this.userService = userService;
+            this.roleService = roleService;
+            this.passwordEncoder = passwordEncoder;
+        }
 
-    @Bean
-    public HiddenHttpMethodFilter hiddenHttpMethodFilter() {
-        return new HiddenHttpMethodFilter();
+
+        @GetMapping("/users")
+        public ResponseEntity<List<User>> getAllUsers(Authentication auth) {
+            List<User> users = userService.getAllUsers();
+            return new ResponseEntity<>(users, HttpStatus.OK);
+        }
+
+        @GetMapping("/users/{id}")
+        public ResponseEntity<User> getUserById(@PathVariable("id") Long id) {
+            User user = userService.getUserById(id);
+            return user != null ? new ResponseEntity<>(user, HttpStatus.OK) : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        @PostMapping("/users")
+        public ResponseEntity<User> addUser(@RequestBody User user, @RequestParam List<Long> roleId) {
+            userService.addUser(user, roleId);
+            return new ResponseEntity<>(user, HttpStatus.CREATED);
+        }
+
+        @PutMapping("/users/{id}")
+        public ResponseEntity<HttpStatus> updateUser(@PathVariable("id") Long id, @RequestBody User updatedUser,
+                @RequestParam(value = "newPassword", required = false) String newPassword,
+                @RequestParam List<Long> roleId) {
+
+            User existingUser = userService.getUserById(id);
+            if (existingUser == null) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+
+            if (newPassword != null && !newPassword.isEmpty()) {
+                String hashedPassword = passwordEncoder.encode(newPassword);
+                existingUser.setPassword(hashedPassword);
+            }
+
+            existingUser.setName(updatedUser.getName());
+            existingUser.setLastName(updatedUser.getLastName());
+            existingUser.setAge(updatedUser.getAge());
+            existingUser.setUsername(updatedUser.getUsername());
+            existingUser.setRoles(updatedUser.getRoles());
+
+            userService.updateUser(existingUser, roleId);
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+
+
+        @DeleteMapping("/users/{id}")
+        public ResponseEntity<Void> deleteUser(@PathVariable("id") Long id) {
+            userService.deleteUser(id);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
     }
-
-    @Autowired
-    public AdminController(UserService userService, RoleService roleService, PasswordEncoder passwordEncoder) {
-        this.userService = userService;
-        this.roleService = roleService;
-    }
-
-    @GetMapping("/admin")
-    public String allUsers(Model model, Authentication auth) {
-        List<User> users = userService.getAllUsers();
-        User curUser = (User) auth.getPrincipal();
-        model.addAttribute("users", users);
-        model.addAttribute("curUser", curUser);
-        return "admin";
-    }
-
-    @GetMapping("/admin/new-user")
-    public String newUserForm(Model model) {
-        model.addAttribute("user", new User());
-        model.addAttribute("roles", roleService.getRoles());
-        return "newUser";
-    }
-
-    @PostMapping("/admin/add-user")
-    public String addUser(@ModelAttribute("user") User user, @RequestParam List<Long> roleId) {
-        userService.addUser(user, roleId);
-        return "redirect:/admin";
-    }
-
-    @GetMapping("admin/edit/{id}")
-    public String editUserForm(@PathVariable("id") Long id, Model model) {
-        User user = userService.getUserById(id);
-        model.addAttribute("user", user);
-        model.addAttribute("roles", roleService.getRoles());
-        return "editUser";
-    }
-
-    @PostMapping("/admin/update")
-    public String updateUser(@ModelAttribute("user") User user, @RequestParam List<Long> roleId) {
-        userService.updateUser(user, roleId);
-        return "redirect:/admin";
-    }
-
-    @GetMapping("/admin/view")
-    public String showViewUserForm(@RequestParam("id") Long id, Model model) {
-        User user = userService.getUserById(id);
-        model.addAttribute("user", user);
-        model.addAttribute("roles", roleService.getRoles());
-        return "viewUser";
-    }
-
-    @DeleteMapping("/admin/delete")
-    public String deleteUser(@RequestParam("id") Long id) {
-        userService.deleteUser(id);
-        return "redirect:/admin";
-    }
-
-}

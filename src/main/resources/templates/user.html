@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="https://www.thymeleaf.org">
+<html lang="en" xmlns:th="https://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -22,14 +22,13 @@
             <div class="list-group">
                 <a href="/user" class="list-group-item list-group-item-action active">User</a>
                 <a href="/admin" class="list-group-item list-group-item-action" sec:authorize="hasRole('ADMIN')">Admin</a>
-
             </div>
         </div>
         <div class="col-10">
-            <h2>User information-page</h2>
+            <h2>User Information</h2>
             <div class="card mt-3">
                 <div class="card-header">
-                    About user
+                    About Current User
                 </div>
                 <div class="card-body">
                     <table class="table table-striped">
@@ -43,20 +42,8 @@
                             <th>Role</th>
                         </tr>
                         </thead>
-                        <tbody>
-                        <tr>
-                            <td th:text="${user.id}"></td>
-                            <td th:text="${user.name}"></td>
-                            <td th:text="${user.lastName}"></td>
-                            <td th:text="${user.age}"></td>
-                            <td th:text="${user.username}"></td>
-
-                            <td>
-                                <ul class="list-unstyled mb-0">
-                                    <li th:each="role : ${user.roles}" th:text="${role.name}"></li>
-                                </ul>
-                            </td>
-                        </tr>
+                        <tbody id="userInfo">
+                        <!-- User info JavaScript -->
                         </tbody>
                     </table>
                 </div>
@@ -67,5 +54,6 @@
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="/static/user.js"></script>
 </body>
 </html>
